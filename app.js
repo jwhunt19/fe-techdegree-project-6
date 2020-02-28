@@ -1,6 +1,6 @@
 const qwerty = document.getElementById('qwerty');
 const phrase = document.getElementById('phrase');
-const startButton = document.getElementById('overlay');
+const overlay = document.getElementById('overlay');
 let missed = 0;
 let phrases = [
     'a cat may look at a king',
@@ -25,6 +25,8 @@ function addPhraseToDisplay(array){
         const ul = document.getElementById('phrase').firstElementChild;
         if (array[i] !== ' '){
             node.classList.add('letter');
+        } else if (array[i] == ' '){
+            node.classList.add('space');
         }
         node.appendChild(textnode);
         ul.appendChild(node);
@@ -44,12 +46,59 @@ function checkLetter(buttonPressed){
     return matchingLetter;
 }
 
-// Hide the start overlay
-startButton.addEventListener('click', () => {
+// Check if game has been won
+function checkWin(){
+    const show = document.getElementsByClassName('show');
+    const letters = document.getElementsByClassName('letter');
+    let gameOver = false;
+    if(show.length === letters.length){
+        overlay.classList.add('win');
+        overlay.children[0].textContent = 'YOU WIN';
+        overlay.children[1].textContent = 'Try Again';
+        overlay.style.visibility = "visible";
+    } else if (missed >= 5) {
+        overlay.classList.add('lose');
+        overlay.children[0].textContent = 'YOU LOSE';
+        overlay.children[1].textContent = 'Try Again';
+        overlay.style.visibility = "visible";
+    }
+
+}
+
+
+
+// Hide the start overlay, reset game if try again is chosen
+overlay.addEventListener('click', () => {
     if (event.target.textContent === 'Start Game'){
-    startButton.style.visibility = "hidden";
+        overlay.style.visibility = "hidden";
+    }
+    if (event.target.textContent === 'Try Again'){
+        const phraseDiv = document.getElementById('phrase');
+        phraseDiv.removeChild(phraseDiv.firstElementChild);
+        phraseDiv.appendChild(document.createElement('UL'));
+        let phraseArray = getRandomPhraseAsArray(phrases);
+        addPhraseToDisplay(phraseArray);
+        const chosen = document.getElementsByClassName('chosen');
+        for(i = chosen.length-1; i >= 0; i--){
+            console.log(chosen[i]);
+            chosen[i].disabled = false;
+            chosen[i].classList.remove('chosen');
+        }
+        missed = 0;
+        const tries = document.getElementsByClassName('tries');
+        for(i = 4; i >= 0; i--){
+            if(tries[i].children[0].src.includes('images/lostHeart.png') === true){
+                tries[i].children[0].src = 'images/liveHeart.png';
+            }
+        
+        }
+        overlay.style.visibility = "hidden";
+        overlay.classList.remove('win');
+        overlay.classList.remove('lose');
     }
 });
+
+
 
 // add chosen class, disable clicked button, if null remove life 
 qwerty.addEventListener('click', () => {
@@ -71,7 +120,8 @@ qwerty.addEventListener('click', () => {
             }
         }
     }
+    checkWin();
 });
 
-const phraseArray = getRandomPhraseAsArray(phrases);
+let phraseArray = getRandomPhraseAsArray(phrases);
 addPhraseToDisplay(phraseArray);
