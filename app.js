@@ -80,7 +80,6 @@ overlay.addEventListener('click', () => {
         addPhraseToDisplay(phraseArray);
         const chosen = document.getElementsByClassName('chosen');
         for(i = chosen.length-1; i >= 0; i--){
-            console.log(chosen[i]);
             chosen[i].disabled = false;
             chosen[i].classList.remove('chosen');
         }
@@ -110,7 +109,7 @@ qwerty.addEventListener('click', () => {
         button.disabled = true;
     }
     const letterFound = checkLetter(button);
-    if(letterFound === null){
+    if(button.tagName === 'BUTTON' && letterFound === null){
         missed += 1;
         const tries = document.getElementsByClassName('tries');
         for(i = 4; i >= 0; i--){
